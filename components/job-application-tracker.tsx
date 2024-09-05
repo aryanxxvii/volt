@@ -171,7 +171,12 @@ export function JobApplicationTracker() {
         job.company.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (statusFilter === 'All' || job.status === statusFilter)
     )
-    .sort((a, b) => sortOrder === 'asc' ? a.ctc - b.ctc : b.ctc - a.ctc)
+    .sort((a, b) => {
+      const ctcA = a.ctc ?? 0; // Use 0 if a.ctc is null or undefined
+      const ctcB = b.ctc ?? 0; // Use 0 if b.ctc is null or undefined
+
+      return sortOrder === 'asc' ? ctcA - ctcB : ctcB - ctcA;
+    })
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
@@ -211,13 +216,13 @@ export function JobApplicationTracker() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="ctc" className="text-right">Annual CTC (Lakhs)</Label>
-                <Input
-                  id="ctc"
+                <input
                   type="number"
                   className="col-span-3"
-                  value={newJob.ctc}
+                  value={newJob.ctc ?? ""}  // Use an empty string if newJob.ctc is null
                   onChange={(e) => setNewJob({ ...newJob, ctc: Number(e.target.value) })}
                 />
+
               </div>
             </div>
             <Button onClick={handleAddJob}>Add Job</Button>
@@ -278,15 +283,21 @@ export function JobApplicationTracker() {
           </TableHeader>
           <TableBody>
             {filteredJobs.map((job, index) => (
+
               <TableRow key={job.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{job.title}</TableCell>
                 <TableCell>{job.company}</TableCell>
                 <TableCell>
-                  <span className="font-semibold">₹{Math.floor(job.ctc)}</span>
-                  <span className="text-gray-400">.{(job.ctc % 1).toFixed(2).slice(2)} L</span>
+                  <span className="font-semibold">
+                    ₹{Math.floor(job.ctc ?? 0)} {/* Fallback to 0 if job.ctc is null or undefined */}
+                  </span>
+                  <span className="text-gray-400">
+                    .{((job.ctc ?? 0) % 1).toFixed(2).slice(2)} L {/* Handle fractional part safely */}
+                  </span>
                 </TableCell>
                 <TableCell>
+
                   <Select onValueChange={(value) => handleStatusChange(job.id, value as 'Applied' | 'Rejected' | 'Selected')}>
                     <SelectTrigger className={`w-[120px] ${getStatusColor(job.status)}`}>
                       <SelectValue placeholder={job.status} />
