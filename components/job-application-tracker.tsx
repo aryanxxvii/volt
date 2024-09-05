@@ -257,7 +257,7 @@ export function JobApplicationTracker() {
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent >
             <SelectItem value="All">All</SelectItem>
             <SelectItem value="Applied">Applied</SelectItem>
             <SelectItem value="Rejected">Rejected</SelectItem>
