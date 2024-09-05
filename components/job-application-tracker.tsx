@@ -15,7 +15,7 @@ type Job = {
   id: number
   title: string
   company: string
-  ctc: number
+  ctc: number | null
   status: 'Applied' | 'Rejected' | 'Selected'
   note: string
 }
@@ -104,7 +104,7 @@ export function JobApplicationTracker() {
   const [newJob, setNewJob] = useState<Omit<Job, 'id'>>({
     title: '',
     company: '',
-    ctc: 0,
+    ctc: null,
     status: 'Applied',
     note: ''
   })
@@ -130,7 +130,7 @@ export function JobApplicationTracker() {
   const handleAddJob = () => {
     const id = jobData.length > 0 ? Math.max(...jobData.map(job => job.id)) + 1 : 1
     setJobData([...jobData, { ...newJob, id }])
-    setNewJob({ title: '', company: '', ctc: 0, status: 'Applied', note: '' })
+    setNewJob({ title: '', company: '', ctc: null, status: 'Applied', note: '' })
     setIsAddJobOpen(false)
   }
 
