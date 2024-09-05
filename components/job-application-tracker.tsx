@@ -186,7 +186,7 @@ export function JobApplicationTracker() {
           <DialogTrigger asChild>
             <Button>Add Job</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="bg-white sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Add New Job</DialogTitle>
             </DialogHeader>
