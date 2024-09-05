@@ -191,7 +191,7 @@ export function JobApplicationTracker() {
           <DialogTrigger asChild>
             <Button>Add Job</Button>
           </DialogTrigger>
-          <DialogContent className="bg-white sm:max-w-[425px]">
+          <DialogContent className="bg-slate-100 sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Add New Job</DialogTitle>
             </DialogHeader>
@@ -200,7 +200,7 @@ export function JobApplicationTracker() {
                 <Label htmlFor="title" className="text-right">Title</Label>
                 <Input
                   id="title"
-                  className="col-span-3"
+                  className="border-2 col-span-3"
                   value={newJob.title}
                   onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
                 />
@@ -209,16 +209,16 @@ export function JobApplicationTracker() {
                 <Label htmlFor="company" className="text-right">Company</Label>
                 <Input
                   id="company"
-                  className="col-span-3"
+                  className="border-2 col-span-3"
                   value={newJob.company}
                   onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="ctc" className="text-right">Annual CTC (Lakhs)</Label>
-                <input
+                <Input
                   type="number"
-                  className="col-span-3"
+                  className="border-2 col-span-3"
                   value={newJob.ctc ?? ""}  // Use an empty string if newJob.ctc is null
                   onChange={(e) => setNewJob({ ...newJob, ctc: Number(e.target.value) })}
                 />
@@ -312,11 +312,19 @@ export function JobApplicationTracker() {
                 <TableCell>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-600 hover:bg-blue-100">
-                        {job.note ? <Pencil className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                      </Button>
+                      {job.note ?
+                        <Button variant="ghost" size="icon" className="text-green-400 hover:text-green-600 bg-green-100">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        :
+                        <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-600 bg-blue-100">
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      }
+
+
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
+                    <DialogContent className="bg-white sm:max-w-[425px]">
                       <DialogHeader>
                         <DialogTitle>{job.note ? 'Edit Note' : 'Add Note'}</DialogTitle>
                       </DialogHeader>
@@ -327,13 +335,12 @@ export function JobApplicationTracker() {
                           </Label>
                           <Input
                             id="note"
-                            className="col-span-3"
+                            className="border-2 col-span-3"
                             value={newNote}
                             onChange={(e) => setNewNote(e.target.value)}
                           />
                         </div>
                       </div>
-                      <Button onClick={() => handleAddNote(job.id)}>Save Note</Button>
                     </DialogContent>
                   </Dialog>
                 </TableCell>
