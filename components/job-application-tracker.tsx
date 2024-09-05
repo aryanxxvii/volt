@@ -290,10 +290,9 @@ export function JobApplicationTracker() {
                 <TableCell>{job.company}</TableCell>
                 <TableCell>
                   <span className="font-semibold">
-                    ₹{Math.floor(job.ctc ?? 0)} {/* Fallback to 0 if job.ctc is null or undefined */}
+                    ₹ {Math.floor(job.ctc ?? 0)}{/* Fallback to 0 if job.ctc is null or undefined */}
                   </span>
-                  <span className="text-gray-400">
-                    .{((job.ctc ?? 0) % 1).toFixed(2).slice(2)} L {/* Handle fractional part safely */}
+                  <span className="text-gray-400">.{((job.ctc ?? 0) % 1).toFixed(2).slice(2)} L {/* Handle fractional part safely */}
                   </span>
                 </TableCell>
                 <TableCell>
