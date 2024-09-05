@@ -140,12 +140,22 @@ export function JobApplicationTracker() {
 
   const handleAddNote = (jobId: number) => {
     setJobData(jobData.map(job => job.id === jobId ? { ...job, note: newNote } : job))
-    setNewNote('')
+    // setNewNote('')
     setSelectedJobId(null)
   }
 
+
+
   const handleDeleteJob = (jobId: number) => {
     setJobData(jobData.filter(job => job.id !== jobId))
+  }
+
+  const getJobNote = (jobId: number) => {
+    const job = jobData.find(job => job.id === jobId)
+    if (job) {
+      return job.note
+    }
+    return ''
   }
 
   const getStatusColor = (status: string) => {
@@ -162,6 +172,7 @@ export function JobApplicationTracker() {
     if (job) {
       setNewNote(job.note)
       setSelectedJobId(job.id)
+
     }
   }
 
@@ -189,7 +200,7 @@ export function JobApplicationTracker() {
       <div className="flex gap-4 mb-4">
         <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
           <DialogTrigger asChild>
-            <Button>Add Job</Button>
+            <Button className='transition duration-200 ease-in-out hover:scale-[102%]'>Add Job</Button>
           </DialogTrigger>
           <DialogContent className="bg-slate-100 sm:max-w-[425px]">
             <DialogHeader>
@@ -230,7 +241,7 @@ export function JobApplicationTracker() {
         </Dialog>
         <Dialog open={isAnalyticsOpen} onOpenChange={setIsAnalyticsOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800">
+            <Button className="transition duration-200 ease-in-out hover:scale-[102%] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800">
               <BarChart className="mr-2 h-4 w-4" />
               View Analytics
             </Button>
@@ -272,9 +283,9 @@ export function JobApplicationTracker() {
               <TableHead className="w-[50px]">#</TableHead>
               <TableHead>Job Title</TableHead>
               <TableHead>Company Name</TableHead>
-              <TableHead className="cursor-pointer group" onClick={toggleSortOrder}>
+              <TableHead className="cursor-pointer group items-center" onClick={toggleSortOrder}>
                 Annual CTC (Lakhs)
-                <ArrowUpDown className="ml-2 h-4 w-4 opacity-0 group-hover:opacity-100 inline" />
+                <ArrowUpDown className="ml-2 h-full w-4 opacity-0 group-hover:opacity-100 transition transition-duration-300 inline" />
               </TableHead>
               <TableHead>Application Status</TableHead>
               <TableHead>Notes</TableHead>
@@ -310,7 +321,7 @@ export function JobApplicationTracker() {
                 </TableCell>
                 <TableCell>
                   <Dialog>
-                    <DialogTrigger asChild>
+                    <DialogTrigger asChild onClick={() => setNewNote(job.note ?? "")}>
                       {job.note ?
                         <Button variant="ghost" size="icon" className="text-green-400 hover:text-green-600 bg-green-100">
                           <Pencil className="h-4 w-4" />
@@ -320,25 +331,24 @@ export function JobApplicationTracker() {
                           <Plus className="h-4 w-4" />
                         </Button>
                       }
-
-
                     </DialogTrigger>
                     <DialogContent className="bg-white sm:max-w-[425px]">
                       <DialogHeader>
-                        <DialogTitle>{job.note ? 'Edit Note' : 'Add Note'}</DialogTitle>
+                        <DialogTitle>Your Note</DialogTitle>
                       </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="note" className="text-right">
+                      <div className="grid gap-4 w-full py-4 items-center">
+                        {/* <div className="grid grid-cols-5  gap-4"> */}
+                        {/* <Label htmlFor="note" className="text-left">
                             Note
-                          </Label>
-                          <Input
-                            id="note"
-                            className="border-2 col-span-3"
-                            value={newNote}
-                            onChange={(e) => setNewNote(e.target.value)}
-                          />
-                        </div>
+                          </Label> */}
+                        <Input
+                          id="note"
+                          className="border-2 col-span-4 h-16"
+                          value={newNote}
+                          onChange={(e) => setNewNote(e.target.value)}
+                        />
+                        {/* </div> */}
+                        <Button className="transition duration-200 ease-in-out hover:scale-105 hover:bg-gray-900 " onClick={() => handleAddNote(job.id)}>Save Note</Button>
                       </div>
                     </DialogContent>
                   </Dialog>
