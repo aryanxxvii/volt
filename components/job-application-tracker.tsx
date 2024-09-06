@@ -384,7 +384,7 @@ export function JobApplicationTracker() {
               <TableHead className="whitespace-nowrap">Company Name</TableHead>
               <TableHead className="whitespace-nowrap flex items-center cursor-pointer group" onClick={toggleSortOrder}>
                 CTC (Lacs)
-                <ArrowUpDown className="ml-2 h-full w-4 transition-all duration-300 ease-in-out hover:rotate-180 hover:scale-110" />
+                <ArrowUpDown className="ml-2 h-full w-4 transition-all duration-300 ease-in-out md:group-hover:rotate-180 group-active:scale-[115%]" />
               </TableHead>
               <TableHead className="whitespace-nowrap">Application Status</TableHead>
               <TableHead className="whitespace-nowrap">Actions</TableHead>
