@@ -101,6 +101,7 @@ function JobAnalytics({ jobData }: { jobData: Job[] }) {
 
 export function JobApplicationTracker() {
   const [jobData, setJobData] = useState<Job[]>([])
+  const [isMobileDevice, setIsMobileDevice] = useState(false)
   const [newJob, setNewJob] = useState<Omit<Job, 'id'>>({
     title: '',
     company: '',
@@ -129,6 +130,13 @@ export function JobApplicationTracker() {
     }
   }, [])
   const inputRef = useRef<HTMLInputElement>(null);  // Create a ref for the input element
+  useEffect(() => {
+    if (window?.innerWidth < 768) {
+      setIsMobileDevice(true)
+    } else {
+      setIsMobileDevice(false)
+    }
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('jobData', JSON.stringify(jobData))
@@ -291,7 +299,7 @@ export function JobApplicationTracker() {
             <Dialog open={isResumeDialogOpen} onOpenChange={setIsResumeDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="px-4 py-0 bg-gray-200/75 border border-2 border-gray-300 hover:bg-gray-200 text-gray-600 transition duration-200 ease-in-out hover:scale-[102%]">
-                  <Upload className="md:mr-2 h-4 w-4" />{!(window.innerWidth < 768) && "Add Resume"}</Button>
+                  <Upload className="md:mr-2 h-4 w-4" />{!(isMobileDevice) && "Add Resume"}</Button>
               </DialogTrigger>
               <DialogContent className="bg-slate-100 rounded rounded-lg w-[70%]">
                 <DialogHeader>
@@ -319,7 +327,7 @@ export function JobApplicationTracker() {
               <DialogTrigger asChild>
                 <Button className="bg-blue-100/75 border border-2 border-blue-200 hover:bg-blue-100 text-blue-500/75 transition duration-200 ease-in-out hover:scale-[102%]">
                   <EyeIcon className="md:mr-2 h-4 w-4" />
-                  {!(window.innerWidth < 768) && "View Resume"}
+                  {!(isMobileDevice) && "View Resume"}
                 </Button>
               </DialogTrigger>
               {/* <DialogContent className="bg-white sm:max-w-[80vw] sm:max-h-[80vh] h-[80vh]"> */}
