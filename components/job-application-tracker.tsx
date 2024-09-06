@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trash2, BarChart, Search, ArrowUpDown, Plus, Pencil } from 'lucide-react'
+import { Trash2, BarChart, Search, ArrowUpDown, Plus, Pencil, Upload, X } from 'lucide-react'
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 type Job = {
@@ -115,17 +115,34 @@ export function JobApplicationTracker() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'All' | 'Applied' | 'Rejected' | 'Selected'>('All')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [resume, setResume] = useState<string | null>(null)
+  const [isResumeDialogOpen, setIsResumeDialogOpen] = useState(false)
+  const [isResumeViewOpen, setIsResumeViewOpen] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const storedJobs = localStorage.getItem('jobData')
+    const storedResume = localStorage.getItem('resume')
     if (storedJobs) {
       setJobData(JSON.parse(storedJobs))
     }
+    if (storedResume) {
+      setResume(storedResume)
+    }
   }, [])
+  const inputRef = useRef<HTMLInputElement>(null);  // Create a ref for the input element
 
   useEffect(() => {
     localStorage.setItem('jobData', JSON.stringify(jobData))
   }, [jobData])
+
+  useEffect(() => {
+    if (resume) {
+      localStorage.setItem('resume', resume)
+    } else {
+      localStorage.removeItem('resume')
+    }
+  }, [resume])
 
   const handleAddJob = () => {
     const id = jobData.length > 0 ? Math.max(...jobData.map(job => job.id)) + 1 : 1
@@ -140,22 +157,11 @@ export function JobApplicationTracker() {
 
   const handleAddNote = (jobId: number) => {
     setJobData(jobData.map(job => job.id === jobId ? { ...job, note: newNote } : job))
-    // setNewNote('')
     setSelectedJobId(null)
   }
 
-
-
   const handleDeleteJob = (jobId: number) => {
     setJobData(jobData.filter(job => job.id !== jobId))
-  }
-
-  const getJobNote = (jobId: number) => {
-    const job = jobData.find(job => job.id === jobId)
-    if (job) {
-      return job.note
-    }
-    return ''
   }
 
   const getStatusColor = (status: string) => {
@@ -172,9 +178,9 @@ export function JobApplicationTracker() {
     if (job) {
       setNewNote(job.note)
       setSelectedJobId(job.id)
-
     }
   }
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog
 
   const filteredJobs = jobData
     .filter(job =>
@@ -183,14 +189,51 @@ export function JobApplicationTracker() {
       (statusFilter === 'All' || job.status === statusFilter)
     )
     .sort((a, b) => {
-      const ctcA = a.ctc ?? 0; // Use 0 if a.ctc is null or undefined
-      const ctcB = b.ctc ?? 0; // Use 0 if b.ctc is null or undefined
-
+      const ctcA = a.ctc ?? 0;
+      const ctcB = b.ctc ?? 0;
       return sortOrder === 'asc' ? ctcA - ctcB : ctcB - ctcA;
     })
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+  }
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const content = e.target?.result as string
+        setResume(content)
+        setIsResumeDialogOpen(false)
+        setIsResumeViewOpen(true)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+  }
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    const file = event.dataTransfer.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const content = e.target?.result as string
+        setResume(content)
+        setIsResumeDialogOpen(false)
+        setIsResumeViewOpen(true)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleDeleteResume = () => {
+    setResume(null)
+    setIsResumeViewOpen(false)
   }
 
   return (
@@ -200,7 +243,7 @@ export function JobApplicationTracker() {
       <div className="flex gap-4 mb-4">
         <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
           <DialogTrigger asChild>
-            <Button className='transition duration-200 ease-in-out hover:scale-[102%]'>Add Job</Button>
+            <Button className='bg-[#282828] transition duration-200 ease-in-out hover:scale-[102%]'>+ Add Job</Button>
           </DialogTrigger>
           <DialogContent className="bg-slate-100 sm:max-w-[425px]">
             <DialogHeader>
@@ -230,10 +273,9 @@ export function JobApplicationTracker() {
                 <Input
                   type="number"
                   className="border-2 col-span-3"
-                  value={newJob.ctc ?? ""}  // Use an empty string if newJob.ctc is null
+                  value={newJob.ctc ?? ""}
                   onChange={(e) => setNewJob({ ...newJob, ctc: Number(e.target.value) })}
                 />
-
               </div>
             </div>
             <Button onClick={handleAddJob}>Add Job</Button>
@@ -241,7 +283,7 @@ export function JobApplicationTracker() {
         </Dialog>
         <Dialog open={isAnalyticsOpen} onOpenChange={setIsAnalyticsOpen}>
           <DialogTrigger asChild>
-            <Button className="transition duration-200 ease-in-out hover:scale-[102%] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800">
+            <Button className="transition duration-200 ease-in-out hover:scale-[102%] bg-orange-100 border border-2 border-orange-300 text-orange-600 hover:bg-orange-200/75">
               <BarChart className="mr-2 h-4 w-4" />
               View Analytics
             </Button>
@@ -253,6 +295,61 @@ export function JobApplicationTracker() {
             <JobAnalytics jobData={jobData} />
           </DialogContent>
         </Dialog>
+        <div id="addresume" className="ml-auto">
+          {!resume ?
+            <Dialog open={isResumeDialogOpen} onOpenChange={setIsResumeDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="outline outline-1 outline-gray-300 bg-white hover:bg-gray-200 hover:outline-gray-200 text-gray-800 transition duration-200 ease-in-out hover:scale-[102%]">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Add Resume
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-100 sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Upload Resume</DialogTitle>
+                </DialogHeader>
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    accept=".pdf"
+                  />
+                  <p>Drag and drop your resume here, or click to select a file</p>
+                </div>
+              </DialogContent>
+            </Dialog>
+            :
+            <Dialog open={isResumeViewOpen} onOpenChange={setIsResumeViewOpen}>
+              <DialogTrigger asChild>
+                <Button disabled={!resume} className="transition duration-200 ease-in-out hover:scale-[102%]">View Resume</Button>
+              </DialogTrigger>
+              <DialogContent className="bg-white sm:max-w-[80vw] sm:max-h-[80vh] h-[80vh]">
+                <DialogHeader>
+                  <DialogTitle>Your Resume</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col">
+                  <div className="flex justify-end space-x-2 mb-4">
+                    <Button onClick={() => setIsResumeDialogOpen(true)} className="transition duration-200 ease-in-out hover:scale-105">Change Resume</Button>
+                    <Button variant="destructive" onClick={handleDeleteResume} className="transition duration-200 ease-in-out hover:scale-105">Delete Resume</Button>
+                  </div>
+                  <iframe
+                    src={resume ?? ''}
+                    className="w-full h-[60vh]"
+                    title="Resume"
+                  />
+                </div>
+
+              </DialogContent>
+            </Dialog>
+          }
+        </div>
       </div>
       <div className="flex gap-4 mb-4">
         <div className="relative flex-grow">
@@ -294,20 +391,18 @@ export function JobApplicationTracker() {
           </TableHeader>
           <TableBody>
             {filteredJobs.map((job, index) => (
-
               <TableRow key={job.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{job.title}</TableCell>
                 <TableCell>{job.company}</TableCell>
                 <TableCell>
                   <span className="font-semibold">
-                    ₹ {Math.floor(job.ctc ?? 0)}{/* Fallback to 0 if job.ctc is null or undefined */}
+                    ₹ {Math.floor(job.ctc ?? 0)}
                   </span>
-                  <span className="text-gray-400">.{((job.ctc ?? 0) % 1).toFixed(2).slice(2)} L {/* Handle fractional part safely */}
+                  <span className="text-gray-400">.{((job.ctc ?? 0) % 1).toFixed(2).slice(2)} L
                   </span>
                 </TableCell>
                 <TableCell>
-
                   <Select onValueChange={(value) => handleStatusChange(job.id, value as 'Applied' | 'Rejected' | 'Selected')}>
                     <SelectTrigger className={`w-[120px] ${getStatusColor(job.status)}`}>
                       <SelectValue placeholder={job.status} />
@@ -320,38 +415,56 @@ export function JobApplicationTracker() {
                   </Select>
                 </TableCell>
                 <TableCell>
-                  <Dialog>
-                    <DialogTrigger asChild onClick={() => setNewNote(job.note ?? "")}>
-                      {job.note ?
+
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild onClick={() => {
+                      setNewNote(job.note ?? ""); // Only reset the value when needed
+                      setIsDialogOpen(true); // Open the dialog
+
+                      // Ensure the cursor moves to the end
+                      setTimeout(() => {
+                        if (inputRef.current) {
+                          const length = inputRef.current.value.length;
+                          inputRef.current.setSelectionRange(length, length); // Set cursor at the end
+                        }
+                      }, 0); // Slight delay to ensure input is rendered
+                    }}>
+                      {job.note ? (
                         <Button variant="ghost" size="icon" className="text-green-400 hover:text-green-600 bg-green-100">
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        :
+                      ) : (
                         <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-600 bg-blue-100">
                           <Plus className="h-4 w-4" />
                         </Button>
-                      }
+                      )}
                     </DialogTrigger>
+
                     <DialogContent className="bg-white sm:max-w-[425px]">
                       <DialogHeader>
                         <DialogTitle>Your Note</DialogTitle>
                       </DialogHeader>
                       <div className="grid gap-4 w-full py-4 items-center">
-                        {/* <div className="grid grid-cols-5  gap-4"> */}
-                        {/* <Label htmlFor="note" className="text-left">
-                            Note
-                          </Label> */}
                         <Input
                           id="note"
                           className="border-2 col-span-4 h-16"
                           value={newNote}
+                          ref={inputRef} // Attach the ref to the Input
                           onChange={(e) => setNewNote(e.target.value)}
                         />
-                        {/* </div> */}
-                        <Button className="transition duration-200 ease-in-out hover:scale-105 hover:bg-gray-900 " onClick={() => handleAddNote(job.id)}>Save Note</Button>
+                        <Button
+                          className="transition duration-200 ease-in-out hover:scale-105 hover:bg-gray-900"
+                          onClick={() => {
+                            handleAddNote(job.id); // Call the function to save the note
+                            setIsDialogOpen(false); // Close the dialog after saving
+                          }}
+                        >
+                          Save Note
+                        </Button>
                       </div>
                     </DialogContent>
                   </Dialog>
+
                 </TableCell>
                 <TableCell>
                   <Button variant="ghost" size="icon" onClick={() => handleDeleteJob(job.id)} className="text-red-400 hover:text-red-600 hover:bg-red-100">
@@ -363,6 +476,6 @@ export function JobApplicationTracker() {
           </TableBody>
         </Table>
       </div>
-    </div>
+    </div >
   )
 }
