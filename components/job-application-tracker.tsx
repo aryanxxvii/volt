@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trash2, BarChart, Search, ArrowUpDown, Plus, Pencil, Upload, X } from 'lucide-react'
+import { Trash2, BarChart, Search, ArrowUpDown, Plus, Pencil, Upload, X, EyeIcon } from 'lucide-react'
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 type Job = {
@@ -40,7 +40,7 @@ function JobAnalytics({ jobData }: { jobData: Job[] }) {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28']
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-2 md:h-full">
       <Card>
         <CardHeader>
           <CardTitle>Application Status Distribution</CardTitle>
@@ -227,71 +227,73 @@ export function JobApplicationTracker() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">⚡<span className='font-mono'>Volt</span></h1>
       <hr className="border-gray-300 pb-6" />
-      <div className="flex gap-4 mb-4">
-        <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
-          <DialogTrigger asChild>
-            <Button className='bg-[#282828] transition duration-200 ease-in-out hover:scale-[102%]'>+ Add Job</Button>
-          </DialogTrigger>
-          <DialogContent className="bg-slate-100 sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add New Job</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">Title</Label>
-                <Input
-                  id="title"
-                  className="border-2 col-span-3"
-                  value={newJob.title}
-                  onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
-                />
+      <div className="grid grid-cols-7 md:flex gap-2 mb-4">
+        <div className='col-span-2'>
+          <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
+            <DialogTrigger asChild>
+              <Button className='w-full bg-[#282828] transition duration-200 ease-in-out hover:scale-[102%]'>+ Add Job</Button>
+            </DialogTrigger>
+            <DialogContent className="bg-slate-100 rounded rounded-lg w-[90%]">
+              <DialogHeader>
+                <DialogTitle>Add New Job</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="title" className="text-right">Title</Label>
+                  <Input
+                    id="title"
+                    className="border-2 col-span-3"
+                    value={newJob.title}
+                    onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="company" className="text-right">Company</Label>
+                  <Input
+                    id="company"
+                    className="border-2 col-span-3"
+                    value={newJob.company}
+                    onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="ctc" className="text-right">CTC <span className="text-gray-400 text-xs">(lacs)</span></Label>
+                  <Input
+                    type="number"
+                    className="border-2 col-span-3"
+                    value={newJob.ctc ?? ""}
+                    onChange={(e) => setNewJob({ ...newJob, ctc: Number(e.target.value) })}
+                  />
+                </div>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="company" className="text-right">Company</Label>
-                <Input
-                  id="company"
-                  className="border-2 col-span-3"
-                  value={newJob.company}
-                  onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="ctc" className="text-right">Annual CTC (Lakhs)</Label>
-                <Input
-                  type="number"
-                  className="border-2 col-span-3"
-                  value={newJob.ctc ?? ""}
-                  onChange={(e) => setNewJob({ ...newJob, ctc: Number(e.target.value) })}
-                />
-              </div>
-            </div>
-            <Button onClick={handleAddJob}>Add Job</Button>
-          </DialogContent>
-        </Dialog>
-        <Dialog open={isAnalyticsOpen} onOpenChange={setIsAnalyticsOpen}>
-          <DialogTrigger asChild>
-            <Button className="transition duration-200 ease-in-out hover:scale-[102%] bg-orange-100 border border-2 border-orange-300 text-orange-600 hover:bg-orange-200/75">
-              <BarChart className="mr-2 h-4 w-4" />
-              View Analytics
-            </Button>
-          </DialogTrigger>
-          <DialogContent className=" bg-gray-100 sm:max-w-[80vw] sm:max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Job Application Analytics</DialogTitle>
-            </DialogHeader>
-            <JobAnalytics jobData={jobData} />
-          </DialogContent>
-        </Dialog>
-        <div id="addresume" className="ml-auto">
+              <Button onClick={handleAddJob}>Add Job</Button>
+            </DialogContent>
+          </Dialog>
+        </div>
+        <div className="col-span-3">
+          <Dialog open={isAnalyticsOpen} onOpenChange={setIsAnalyticsOpen}>
+            <DialogTrigger asChild>
+              <Button className="transition duration-200 ease-in-out hover:scale-[102%] bg-orange-100 border border-2 border-orange-300 text-orange-600 hover:bg-orange-200/75">
+                <BarChart className="mr-2 h-4 w-4" />
+                View Analytics
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="h-[80vh] w-[95vw] rounded rounded-lg bg-gray-100 sm:max-w-[80vw] sm:max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Job Application Analytics</DialogTitle>
+              </DialogHeader>
+              <JobAnalytics jobData={jobData} />
+            </DialogContent>
+          </Dialog>
+        </div>
+        <div className="ml-[100%] md:ml-auto col-span-1">
           {!resume ?
             <Dialog open={isResumeDialogOpen} onOpenChange={setIsResumeDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gray-200/75 outline outline-1 outline-gray-300 hover:bg-gray-200 text-gray-600 transition duration-200 ease-in-out hover:scale-[102%]">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Add Resume
-                </Button>
+                <Button className="px-4 py-0 bg-gray-200/75 border border-2 border-gray-300 hover:bg-gray-200 text-gray-600 transition duration-200 ease-in-out hover:scale-[102%]">
+                  <Upload className="md:mr-2 h-4 w-4" />{!(window.innerWidth < 768) && "Add Resume"}</Button>
               </DialogTrigger>
-              <DialogContent className="bg-slate-100 sm:max-w-[425px]">
+              <DialogContent className="bg-slate-100 rounded rounded-lg w-[70%]">
                 <DialogHeader>
                   <DialogTitle>Upload Resume</DialogTitle>
                 </DialogHeader>
@@ -315,17 +317,22 @@ export function JobApplicationTracker() {
             :
             <Dialog open={isResumeViewOpen} onOpenChange={setIsResumeViewOpen}>
               <DialogTrigger asChild>
-                <Button disabled={!resume} className="bg-blue-100/75 outline outline-1 outline-blue-200 hover:bg-blue-100 text-blue-500/75 transition duration-200 ease-in-out hover:scale-[102%]">View Resume</Button>
+                <Button className="bg-blue-100/75 border border-2 border-blue-200 hover:bg-blue-100 text-blue-500/75 transition duration-200 ease-in-out hover:scale-[102%]">
+                  <EyeIcon className="md:mr-2 h-4 w-4" />
+                  {!(window.innerWidth < 768) && "View Resume"}
+                </Button>
               </DialogTrigger>
-              <DialogContent className="bg-white sm:max-w-[80vw] sm:max-h-[80vh] h-[80vh]">
+              {/* <DialogContent className="bg-white sm:max-w-[80vw] sm:max-h-[80vh] h-[80vh]"> */}
+              <DialogContent className="bg-white rounded rounded-lg w-[80%]">
                 <DialogHeader>
                   <DialogTitle>Your Resume</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col">
-                  <div className="flex justify-end space-x-2 mb-4">
-                    <Button onClick={() => setIsResumeDialogOpen(true)} className="transition duration-200 ease-in-out hover:scale-105">Change Resume</Button>
-                    <Button variant="destructive" onClick={handleDeleteResume} className="transition duration-200 ease-in-out hover:scale-105">Delete Resume</Button>
+                  <div className="flex justify-center md:justify-end space-x-2 mb-4">
+                    <Button onClick={() => setIsResumeDialogOpen(true)} className="transition duration-200 ease-in-out hover:scale-105">Change</Button>
+                    <Button variant="destructive" onClick={handleDeleteResume} className="transition duration-200 ease-in-out hover:scale-105">Delete</Button>
                   </div>
+
                   <iframe
                     src={resume ?? ''}
                     className="w-full h-[60vh]"
@@ -365,22 +372,22 @@ export function JobApplicationTracker() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">#</TableHead>
-              <TableHead>Job Title</TableHead>
-              <TableHead>Company Name</TableHead>
-              <TableHead className="cursor-pointer group items-center" onClick={toggleSortOrder}>
-                Annual CTC (Lakhs)
-                <ArrowUpDown className="ml-2 h-full w-4 opacity-0 group-hover:opacity-100 transition transition-duration-300 inline" />
+              <TableHead className="whitespace-nowrap">Job Title</TableHead>
+              <TableHead className="whitespace-nowrap">Company Name</TableHead>
+              <TableHead className="whitespace-nowrap flex items-center cursor-pointer group" onClick={toggleSortOrder}>
+                CTC (Lacs)
+                <ArrowUpDown className="ml-2 h-full w-4 transition-all duration-300 ease-in-out hover:rotate-180 hover:scale-110" />
               </TableHead>
-              <TableHead>Application Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="whitespace-nowrap">Application Status</TableHead>
+              <TableHead className="whitespace-nowrap">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredJobs.map((job, index) => (
               <TableRow key={job.id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{job.title}</TableCell>
-                <TableCell>{job.company}</TableCell>
+                <TableCell className="truncate">{job.title.length > 20 ? `${job.title.slice(0, 17)}...` : job.title}</TableCell>
+                <TableCell className="truncate">{job.company.length > 20 ? `${job.company.slice(0, 17)}...` : job.company}</TableCell>
                 <TableCell>
                   <span className="font-semibold">
                     ₹ {Math.floor(job.ctc ?? 0)}
