@@ -17,7 +17,7 @@ type Job = {
   company: string
   ctc: number | null
   status: 'Applied' | 'Rejected' | 'Selected'
-  note: string
+
 }
 
 function JobAnalytics({ jobData }: { jobData: Job[] }) {
@@ -106,12 +106,10 @@ export function JobApplicationTracker() {
     company: '',
     ctc: null,
     status: 'Applied',
-    note: ''
   })
   const [isAddJobOpen, setIsAddJobOpen] = useState(false)
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false)
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null)
-  const [newNote, setNewNote] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'All' | 'Applied' | 'Rejected' | 'Selected'>('All')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
@@ -147,7 +145,7 @@ export function JobApplicationTracker() {
   const handleAddJob = () => {
     const id = jobData.length > 0 ? Math.max(...jobData.map(job => job.id)) + 1 : 1
     setJobData([...jobData, { ...newJob, id }])
-    setNewJob({ title: '', company: '', ctc: null, status: 'Applied', note: '' })
+    setNewJob({ title: '', company: '', ctc: null, status: 'Applied' })
     setIsAddJobOpen(false)
   }
 
@@ -155,10 +153,7 @@ export function JobApplicationTracker() {
     setJobData(jobData.map(job => job.id === jobId ? { ...job, status: newStatus } : job))
   }
 
-  const handleAddNote = (jobId: number) => {
-    setJobData(jobData.map(job => job.id === jobId ? { ...job, note: newNote } : job))
-    setSelectedJobId(null)
-  }
+
 
   const handleDeleteJob = (jobId: number) => {
     setJobData(jobData.filter(job => job.id !== jobId))
@@ -173,14 +168,6 @@ export function JobApplicationTracker() {
     }
   }
 
-  const openNoteDialog = (jobId: number) => {
-    const job = jobData.find(job => job.id === jobId)
-    if (job) {
-      setNewNote(job.note)
-      setSelectedJobId(job.id)
-    }
-  }
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog
 
   const filteredJobs = jobData
     .filter(job =>
@@ -385,7 +372,6 @@ export function JobApplicationTracker() {
                 <ArrowUpDown className="ml-2 h-full w-4 opacity-0 group-hover:opacity-100 transition transition-duration-300 inline" />
               </TableHead>
               <TableHead>Application Status</TableHead>
-              <TableHead>Notes</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -414,58 +400,7 @@ export function JobApplicationTracker() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell>
 
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild onClick={() => {
-                      setNewNote(job.note ?? ""); // Only reset the value when needed
-                      setIsDialogOpen(true); // Open the dialog
-
-                      // Ensure the cursor moves to the end
-                      setTimeout(() => {
-                        if (inputRef.current) {
-                          const length = inputRef.current.value.length;
-                          inputRef.current.setSelectionRange(length, length); // Set cursor at the end
-                        }
-                      }, 0); // Slight delay to ensure input is rendered
-                    }}>
-                      {job.note ? (
-                        <Button variant="ghost" size="icon" className="text-green-400 hover:text-green-600 bg-green-100">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      ) : (
-                        <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-600 bg-blue-100">
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </DialogTrigger>
-
-                    <DialogContent className="bg-white sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle>Your Note</DialogTitle>
-                      </DialogHeader>
-                      <div className="grid gap-4 w-full py-4 items-center">
-                        <Input
-                          id="note"
-                          className="border-2 col-span-4 h-16"
-                          value={newNote}
-                          ref={inputRef} // Attach the ref to the Input
-                          onChange={(e) => setNewNote(e.target.value)}
-                        />
-                        <Button
-                          className="transition duration-200 ease-in-out hover:scale-105 hover:bg-gray-900"
-                          onClick={() => {
-                            handleAddNote(job.id); // Call the function to save the note
-                            setIsDialogOpen(false); // Close the dialog after saving
-                          }}
-                        >
-                          Save Note
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-
-                </TableCell>
                 <TableCell>
                   <Button variant="ghost" size="icon" onClick={() => handleDeleteJob(job.id)} className="text-red-400 hover:text-red-600 hover:bg-red-100">
                     <Trash2 className="h-4 w-4" />
