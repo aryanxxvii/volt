@@ -299,7 +299,7 @@ export function JobApplicationTracker() {
           {!resume ?
             <Dialog open={isResumeDialogOpen} onOpenChange={setIsResumeDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="outline outline-1 outline-gray-300 bg-white hover:bg-gray-200 hover:outline-gray-200 text-gray-800 transition duration-200 ease-in-out hover:scale-[102%]">
+                <Button className="bg-gray-200/75 outline outline-1 outline-gray-300 hover:bg-gray-200 text-gray-600 transition duration-200 ease-in-out hover:scale-[102%]">
                   <Upload className="mr-2 h-4 w-4" />
                   Add Resume
                 </Button>
@@ -328,7 +328,7 @@ export function JobApplicationTracker() {
             :
             <Dialog open={isResumeViewOpen} onOpenChange={setIsResumeViewOpen}>
               <DialogTrigger asChild>
-                <Button disabled={!resume} className="transition duration-200 ease-in-out hover:scale-[102%]">View Resume</Button>
+                <Button disabled={!resume} className="bg-blue-100/75 outline outline-1 outline-blue-200 hover:bg-blue-100 text-blue-500/75 transition duration-200 ease-in-out hover:scale-[102%]">View Resume</Button>
               </DialogTrigger>
               <DialogContent className="bg-white sm:max-w-[80vw] sm:max-h-[80vh] h-[80vh]">
                 <DialogHeader>
